@@ -1,0 +1,257 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="PipeWizard.Views.SettingsView">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="14">
+
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <StackPanel Spacing="3">
+                <TextBlock Text="Settings" Classes="h1" />
+                <TextBlock Classes="subtitle"
+                           Text="Saved straight into the port's Config.toml. Comments and unknown keys are kept." />
+            </StackPanel>
+            <Button Grid.Column="1" Classes="primary" Content="Save settings"
+                    Command="{Binding SaveCommand}" VerticalAlignment="Center" />
+        </Grid>
+
+        <Border Grid.Row="1" Classes="inset" Padding="12,9" IsVisible="{Binding HasStatus}"
+                BorderBrush="{DynamicResource BorderStrongBrush}">
+            <StackPanel Orientation="Horizontal" Spacing="9">
+                <PathIcon Data="{StaticResource IconWarning}" Width="14" Height="14"
+                          IsVisible="{Binding StatusIsError}"
+                          Foreground="{DynamicResource RedBrush}" VerticalAlignment="Center" />
+                <PathIcon Data="{StaticResource IconCheck}" Width="14" Height="14"
+                          IsVisible="{Binding !StatusIsError}"
+                          Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" FontSize="12.5"
+                           Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" />
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer Grid.Row="2" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="14" Margin="0,0,8,4" VerticalAlignment="Top">
+
+                <StackPanel Grid.Column="0" Spacing="14">
+
+                    <!-- Paths -->
+                    <Border Classes="card">
+                        <StackPanel Spacing="14">
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="Paths" Classes="h2" />
+                                <TextBlock Text="Where PipeWizard looks for everything."
+                                           Classes="caption" />
+                            </StackPanel>
+
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="PORT EXECUTABLE" Classes="label" />
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                    <Border Classes="inset" Padding="10,8">
+                                        <TextBlock Text="{Binding PortPath}" Classes="path" />
+                                    </Border>
+                                    <Button Grid.Column="1" Classes="icon" Click="PickPort"
+                                            ToolTip.Tip="Locate WiiCompiled">
+                                        <PathIcon Data="{StaticResource IconFolder}" Width="15" Height="15" />
+                                    </Button>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="EXTRACTED DISC" Classes="label" />
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                    <Border Classes="inset" Padding="10,8">
+                                        <TextBlock Text="{Binding GamePath}" Classes="path" />
+                                    </Border>
+                                    <Button Grid.Column="1" Classes="icon" Click="PickGameFolder"
+                                            ToolTip.Tip="Choose the extracted disc folder">
+                                        <PathIcon Data="{StaticResource IconFolder}" Width="15" Height="15" />
+                                    </Button>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="CONFIG.TOML" Classes="label" />
+                                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                                    <Border Classes="inset" Padding="10,8">
+                                        <TextBlock Text="{Binding ConfigPath}" Classes="path" />
+                                    </Border>
+                                    <Button Grid.Column="1" Classes="icon" Click="PickConfig"
+                                            ToolTip.Tip="Choose a different Config.toml">
+                                        <PathIcon Data="{StaticResource IconFolder}" Width="15" Height="15" />
+                                    </Button>
+                                    <Button Grid.Column="2" Classes="icon"
+                                            Command="{Binding OpenConfigFolderCommand}"
+                                            ToolTip.Tip="Open the config folder">
+                                        <PathIcon Data="{StaticResource IconExternal}" Width="15" Height="15" />
+                                    </Button>
+                                </Grid>
+                                <TextBlock Text="{Binding ConfigStatus}" Classes="caption" />
+                            </StackPanel>
+
+                            <Button Classes="ghost" HorizontalAlignment="Left" Padding="0"
+                                    Command="{Binding AutoDetectCommand}">
+                                <TextBlock Text="Scan the usual locations again" Classes="accent"
+                                           FontSize="12" />
+                            </Button>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Video -->
+                    <Border Classes="card">
+                        <StackPanel Spacing="14">
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="Video" Classes="h2" />
+                                <TextBlock Text="Written to the [video] section."
+                                           Classes="caption" />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Spacing="1">
+                                    <TextBlock Text="Widescreen" FontSize="13" FontWeight="SemiBold" />
+                                    <TextBlock Text="Use the game's 16:9 layout." Classes="caption" />
+                                </StackPanel>
+                                <ToggleSwitch Grid.Column="1" IsChecked="{Binding Widescreen, Mode=TwoWay}"
+                                              VerticalAlignment="Center" />
+                            </Grid>
+
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="RESOLUTION" Classes="label" />
+                                <ComboBox ItemsSource="{Binding ResolutionOptions}"
+                                          SelectedItem="{Binding SelectedResolution, Mode=TwoWay}" />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="DISPLAY MODE" Classes="label" />
+                                    <ComboBox ItemsSource="{Binding DisplayModes}"
+                                              SelectedItem="{Binding DisplayMode, Mode=TwoWay}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="6">
+                                    <TextBlock Text="GRAPHICS API" Classes="label" />
+                                    <ComboBox ItemsSource="{Binding GraphicsApis}"
+                                              SelectedItem="{Binding GraphicsApi, Mode=TwoWay}" />
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="WINDOW WIDTH" Classes="label" />
+                                    <NumericUpDown Value="{Binding WindowWidth, Mode=TwoWay}"
+                                                   Minimum="320" Maximum="15360" Increment="10"
+                                                   FormatString="0" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="6">
+                                    <TextBlock Text="WINDOW HEIGHT" Classes="label" />
+                                    <NumericUpDown Value="{Binding WindowHeight, Mode=TwoWay}"
+                                                   Minimum="240" Maximum="8640" Increment="10"
+                                                   FormatString="0" />
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Spacing="1">
+                                    <TextBlock Text="FPS counter" FontSize="13" FontWeight="SemiBold" />
+                                    <TextBlock Text="Draw the port's frame counter in game."
+                                               Classes="caption" />
+                                </StackPanel>
+                                <ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowFps, Mode=TwoWay}"
+                                              VerticalAlignment="Center" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Spacing="14">
+
+                    <!-- Launcher -->
+                    <Border Classes="card">
+                        <StackPanel Spacing="14">
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="Launcher" Classes="h2" />
+                                <TextBlock Text="How PipeWizard starts the game." Classes="caption" />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Spacing="1">
+                                    <TextBlock Text="MangoHud" FontSize="13" FontWeight="SemiBold" />
+                                    <TextBlock Classes="caption" TextWrapping="Wrap"
+                                               Text="Starts the game through mangohud so you get the performance overlay. Linux only." />
+                                </StackPanel>
+                                <ToggleSwitch Grid.Column="1" IsChecked="{Binding MangoHud, Mode=TwoWay}"
+                                              VerticalAlignment="Center" />
+                            </Grid>
+
+                            <Border Height="1" Background="{DynamicResource CardBorderBrush}" />
+
+                            <TextBlock Classes="caption" TextWrapping="Wrap"
+                                       Text="PipeWizard never modifies your game files. Mods are enabled by adding their folders to [paths] overlay_roots in Config.toml, which the port applies over the disc at runtime." />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- About -->
+                    <Border Classes="card">
+                        <StackPanel Spacing="14">
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="About" Classes="h2" />
+                                <TextBlock Text="PipeWizard 1.0" Classes="caption" />
+                            </StackPanel>
+
+                            <StackPanel Spacing="10">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                    <Border Width="30" Height="30" CornerRadius="8"
+                                            Background="{DynamicResource AccentSoftBrush}">
+                                        <PathIcon Data="{StaticResource IconMods}" Width="14" Height="14"
+                                                  Foreground="{DynamicResource AccentBrush}" />
+                                    </Border>
+                                    <StackPanel Grid.Column="1" Spacing="1" VerticalAlignment="Center">
+                                        <TextBlock Text="Mods by GameBanana" FontSize="12.5"
+                                                   FontWeight="SemiBold" />
+                                        <TextBlock Classes="caption" TextWrapping="Wrap"
+                                                   Text="Browsing and downloads are limited to game 6247, New Super Mario Bros. Wii." />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                    <Border Width="30" Height="30" CornerRadius="8"
+                                            Background="{DynamicResource AccentSoftBrush}">
+                                        <PathIcon Data="{StaticResource IconFolder}" Width="14" Height="14"
+                                                  Foreground="{DynamicResource AccentBrush}" />
+                                    </Border>
+                                    <StackPanel Grid.Column="1" Spacing="1" VerticalAlignment="Center">
+                                        <TextBlock Text="PipeWizard data" FontSize="12.5" FontWeight="SemiBold" />
+                                        <TextBlock Classes="caption" TextWrapping="Wrap"
+                                                   Text="Settings, installed mods and cached images live here." />
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+
+                            <Button Classes="ghost" HorizontalAlignment="Stretch"
+                                    Command="{Binding OpenDataFolderCommand}">
+                                <StackPanel Orientation="Horizontal" Spacing="7" HorizontalAlignment="Center">
+                                    <PathIcon Data="{StaticResource IconFolder}" Width="14" Height="14"
+                                              Foreground="{Binding $parent[Button].Foreground}" />
+                                    <TextBlock Text="Open data folder"
+                                               Foreground="{Binding $parent[Button].Foreground}" />
+                                </StackPanel>
+                            </Button>
+
+                            <Border Height="1" Background="{DynamicResource CardBorderBrush}" />
+
+                            <TextBlock Classes="caption" TextWrapping="Wrap"
+                                       Text="PipeWizard is free software under the GPL-3.0. It ships no game files: you need your own copy of New Super Mario Bros. Wii and the native port built from its source." />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="inset" Padding="12">
+                        <StackPanel Orientation="Horizontal" Spacing="9">
+                            <PathIcon Data="{StaticResource IconWarning}" Width="14" Height="14"
+                                      Foreground="{DynamicResource WarningBrush}" VerticalAlignment="Center" />
+                            <TextBlock Classes="caption" TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Text="Birdo, Toadette and the rest belong to Nintendo. PipeWizard only manages files you already own." />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

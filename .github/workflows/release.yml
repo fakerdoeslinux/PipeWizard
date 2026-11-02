@@ -1,0 +1,81 @@
+name: PipeWizard
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Build ${{ matrix.rid }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            rid: linux-x64
+            rust-target: x86_64-unknown-linux-gnu
+            archive: tar.gz
+          - runner: windows-2022
+            rid: win-x64
+            rust-target: x86_64-pc-windows-msvc
+            archive: zip
+          - runner: macos-14
+            rid: osx-arm64
+            rust-target: aarch64-apple-darwin
+            archive: zip
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install Rust target
+        run: rustup target add ${{ matrix.rust-target }}
+      - name: Test Rust native library
+        run: cargo test --manifest-path rust-native/Cargo.toml --release --locked
+      - name: Build app
+        run: dotnet build PipeWizard.csproj --configuration Release
+      - name: Check C# to Rust interop
+        run: dotnet bin/Release/net10.0/PipeWizard.dll --self-test
+      - name: Publish self-contained app
+        run: dotnet publish PipeWizard.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true --output publish
+      - name: Include documentation and license
+        shell: bash
+        run: cp README.md LICENSE THIRD-PARTY-NOTICES.md publish/
+      - name: Package Linux app
+        if: runner.os == 'Linux'
+        run: tar -czf PipeWizard-${{ matrix.rid }}.tar.gz -C publish .
+      - name: Package Windows app
+        if: runner.os == 'Windows'
+        run: Compress-Archive -Path publish/* -DestinationPath PipeWizard-${{ matrix.rid }}.zip
+      - name: Package macOS app
+        if: runner.os == 'macOS'
+        run: ditto -c -k --sequesterRsrc --keepParent publish PipeWizard-${{ matrix.rid }}.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PipeWizard-${{ matrix.rid }}
+          path: PipeWizard-${{ matrix.rid }}.${{ matrix.archive }}
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: package
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" release-assets/* --title "$GITHUB_REF_NAME" --generate-notes

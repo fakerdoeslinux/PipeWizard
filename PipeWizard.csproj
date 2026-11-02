@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>PipeWizard</RootNamespace>
+    <AssemblyName>PipeWizard</AssemblyName>
+    <Version>1.0.0</Version>
+    <Description>Mod manager and launcher for the native New Super Mario Bros. Wii PC port.</Description>
+    <Copyright>GPL-3.0</Copyright>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+    <ApplicationIcon>Assets/pipewizard.ico</ApplicationIcon>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <RustNativeDirectory>$(MSBuildProjectDirectory)/rust-native</RustNativeDirectory>
+    <RustNativeTargetDirectory>$(BaseIntermediateOutputPath)rust-native</RustNativeTargetDirectory>
+    <RustNativeRuntimeIdentifier Condition="'$(RuntimeIdentifier)' != ''">$(RuntimeIdentifier)</RustNativeRuntimeIdentifier>
+    <RustNativeRuntimeIdentifier Condition="'$(RustNativeRuntimeIdentifier)' == ''">$(NETCoreSdkRuntimeIdentifier)</RustNativeRuntimeIdentifier>
+    <RustNativeTargetTriple Condition="'$(RustNativeRuntimeIdentifier)' == 'linux-x64'">x86_64-unknown-linux-gnu</RustNativeTargetTriple>
+    <RustNativeTargetTriple Condition="'$(RustNativeRuntimeIdentifier)' == 'win-x64'">x86_64-pc-windows-msvc</RustNativeTargetTriple>
+    <RustNativeTargetTriple Condition="'$(RustNativeRuntimeIdentifier)' == 'osx-x64'">x86_64-apple-darwin</RustNativeTargetTriple>
+    <RustNativeTargetTriple Condition="'$(RustNativeRuntimeIdentifier)' == 'osx-arm64'">aarch64-apple-darwin</RustNativeTargetTriple>
+    <RustNativeLibrary Condition="'$(RustNativeRuntimeIdentifier)' == 'linux-x64'">libpipewizard_native.so</RustNativeLibrary>
+    <RustNativeLibrary Condition="'$(RustNativeRuntimeIdentifier)' == 'win-x64'">pipewizard_native.dll</RustNativeLibrary>
+    <RustNativeLibrary Condition="'$(RustNativeRuntimeIdentifier)' == 'osx-x64' or '$(RustNativeRuntimeIdentifier)' == 'osx-arm64'">libpipewizard_native.dylib</RustNativeLibrary>
+    <RustNativeArtifact>$(RustNativeTargetDirectory)/$(RustNativeTargetTriple)/release/$(RustNativeLibrary)</RustNativeArtifact>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.4" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.4" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.4" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.4" />
+    <PackageReference Include="Avalonia.Wayland" Version="12.1.4" />
+    <PackageReference Include="SharpCompress" Version="0.48.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets/**" />
+    <AvaloniaResource Include="Styles/**" />
+  </ItemGroup>
+
+  <Target Name="BuildPipeWizardRustNative" BeforeTargets="Build;Publish"
+          Condition="'$(DesignTimeBuild)' != 'true'">
+    <Error Condition="'$(RustNativeTargetTriple)' == ''"
+           Text="PipeWizard Rust builds currently support linux-x64, win-x64, osx-x64, and osx-arm64." />
+    <Exec Command="cargo build --locked --release --manifest-path &quot;$(RustNativeDirectory)/Cargo.toml&quot; --target &quot;$(RustNativeTargetTriple)&quot; --target-dir &quot;$(RustNativeTargetDirectory)&quot;" />
+    <MakeDir Directories="$(TargetDir)" />
+    <Copy SourceFiles="$(RustNativeArtifact)" DestinationFolder="$(TargetDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="CopyPipeWizardRustNativeToPublish" AfterTargets="Publish"
+          Condition="'$(DesignTimeBuild)' != 'true'">
+    <MakeDir Directories="$(PublishDir)" />
+    <Copy SourceFiles="$(RustNativeArtifact)" DestinationFolder="$(PublishDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+</Project>

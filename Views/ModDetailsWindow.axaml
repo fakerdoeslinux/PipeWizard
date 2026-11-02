@@ -1,0 +1,188 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PipeWizard.Views.ModDetailsWindow"
+        Title="Mod details"
+        Width="1000" Height="740"
+        MinWidth="840" MinHeight="600"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BgBrush}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Header -->
+        <Border Grid.Row="0" Padding="24,20,24,16"
+                Background="{DynamicResource SidebarBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="0,0,0,1">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="18">
+                <StackPanel Spacing="6">
+                    <TextBlock Text="{Binding Name}" Classes="h1" FontSize="24"
+                               TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis" />
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <TextBlock Text="{Binding Author}" Classes="secondary" FontSize="12.5" />
+                        <TextBlock Text="·" Classes="caption" />
+                        <TextBlock Text="{Binding Category}" Classes="caption" />
+                        <TextBlock Text="·" Classes="caption" />
+                        <TextBlock Text="{Binding VersionText}" Classes="caption" />
+                        <TextBlock Text="·" Classes="caption" />
+                        <TextBlock Text="{Binding AddedText}" Classes="caption" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding StatsText}" Classes="caption" />
+                </StackPanel>
+                <Button Grid.Column="1" VerticalAlignment="Center" Command="{Binding OpenPageCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <PathIcon Data="{StaticResource IconExternal}" Width="14" Height="14"
+                                  Foreground="{Binding $parent[Button].Foreground}" />
+                        <TextBlock Text="GameBanana page"
+                                   Foreground="{Binding $parent[Button].Foreground}" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Body -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,340">
+
+            <!-- Left: screenshots + description -->
+            <Grid Grid.Column="0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled" Padding="24,18,18,18">
+                    <StackPanel Spacing="16" IsVisible="{Binding ShowContent}">
+                        <ItemsControl ItemsSource="{Binding Images}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Width="292" Height="164" CornerRadius="11" ClipToBounds="True"
+                                            Margin="0,0,10,10" Background="{DynamicResource SurfaceAltBrush}"
+                                            BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1">
+                                        <Image Source="{Binding}" Stretch="UniformToFill" />
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="ABOUT THIS MOD" Classes="label" />
+                            <TextBlock Text="{Binding Description}" Classes="body" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <StackPanel IsVisible="{Binding IsLoading}" Spacing="14" Width="300"
+                            VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <ProgressBar IsIndeterminate="True" Height="4" />
+                    <TextBlock Text="Loading the mod page…" Classes="caption"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+
+                <Border IsVisible="{Binding HasLoadError}" Classes="card" MaxWidth="420"
+                        VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <StackPanel Spacing="10" HorizontalAlignment="Center">
+                        <PathIcon Data="{StaticResource IconWarning}" Width="24" Height="24"
+                                  Foreground="{DynamicResource WarningBrush}"
+                                  HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding LoadError}" Classes="body" TextAlignment="Center" />
+                        <Button Classes="primary" Content="Try again" HorizontalAlignment="Center"
+                                Command="{Binding RetryCommand}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Right: install -->
+            <Border Grid.Column="1" Background="{DynamicResource SidebarBrush}"
+                    BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1,0,0,0"
+                    Padding="18">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Spacing="13" IsVisible="{Binding ShowContent}">
+
+                        <Border Classes="inset" Padding="11,9"
+                                Background="{DynamicResource AccentSoftBrush}"
+                                BorderBrush="#265B3C" IsVisible="{Binding ShowInstalledNote}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <PathIcon Data="{StaticResource IconCheck}" Width="14" Height="14"
+                                          Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding InstalledText}" FontSize="12"
+                                           Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="FILES" Classes="label" />
+                        <ListBox Classes="plain" ItemsSource="{Binding Files}"
+                                 SelectedItem="{Binding SelectedFile, Mode=TwoWay}"
+                                 MaxHeight="330">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Spacing="3">
+                                        <TextBlock Text="{Binding Name}" FontSize="12.5" FontWeight="SemiBold"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <TextBlock Text="{Binding VersionText}" Classes="caption" />
+                                            <TextBlock Text="·" Classes="caption" />
+                                            <TextBlock Text="{Binding SizeText}" Classes="caption" />
+                                            <TextBlock Text="·" Classes="caption" />
+                                            <TextBlock Text="{Binding DateText}" Classes="caption" />
+                                        </StackPanel>
+                                        <Border Classes="pill" Padding="6,1" HorizontalAlignment="Left"
+                                                IsVisible="{Binding IsArchived}">
+                                            <TextBlock Text="older version" FontSize="9"
+                                                       Foreground="{DynamicResource TextMutedBrush}" />
+                                        </Border>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <Button Classes="play" HorizontalAlignment="Stretch" MinHeight="46"
+                                Command="{Binding InstallCommand}" IsEnabled="{Binding CanInstall}">
+                            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                                <PathIcon Data="{StaticResource IconDownload}" Width="16" Height="16"
+                                          Foreground="{Binding $parent[Button].Foreground}" />
+                                <TextBlock Text="{Binding InstallButtonText}" FontWeight="SemiBold"
+                                           Foreground="{Binding $parent[Button].Foreground}" />
+                            </StackPanel>
+                        </Button>
+
+                        <Border Classes="inset" Padding="10" IsVisible="{Binding ShowProgress}">
+                            <StackPanel Spacing="7">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Text="Installing" FontSize="12" FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding ProgressText}" Classes="caption"
+                                               Grid.Column="1" />
+                                </Grid>
+                                <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressValue}"
+                                             Height="5" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Classes="inset" Padding="10" IsVisible="{Binding HasStatus}"
+                                BorderBrush="{DynamicResource BorderStrongBrush}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <PathIcon Data="{StaticResource IconWarning}" Width="14" Height="14"
+                                          IsVisible="{Binding StatusIsError}"
+                                          Foreground="{DynamicResource RedBrush}" VerticalAlignment="Top"
+                                          Margin="0,2,0,0" />
+                                <PathIcon Data="{StaticResource IconCheck}" Width="14" Height="14"
+                                          IsVisible="{Binding !StatusIsError}"
+                                          Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Top"
+                                          Margin="0,2,0,0" />
+                                <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" FontSize="12"
+                                           Foreground="{DynamicResource TextBrush}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Height="1" Background="{DynamicResource CardBorderBrush}" Margin="0,2" />
+
+                        <TextBlock Classes="caption" TextWrapping="Wrap"
+                                   Text="PipeWizard unpacks the archive, works out whether it is a Riivolution pack or a disc overlay, and adds one folder to overlay_roots. Enable, reorder or remove it later on the Installed page." />
+
+                        <Button Classes="ghost" HorizontalAlignment="Stretch"
+                                Content="Close" Click="CloseWindow" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

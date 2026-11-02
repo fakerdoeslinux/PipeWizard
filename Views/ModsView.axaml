@@ -1,0 +1,170 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="PipeWizard.Views.ModsView">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="14">
+
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="14">
+            <StackPanel Spacing="3">
+                <TextBlock Text="Browse mods" Classes="h1" />
+                <TextBlock Classes="subtitle"
+                           Text="Every mod below comes from GameBanana's New Super Mario Bros. Wii game page." />
+            </StackPanel>
+            <Button Grid.Column="1" Classes="icon" VerticalAlignment="Center"
+                    Command="{Binding RefreshCommand}" ToolTip.Tip="Refresh from GameBanana">
+                <PathIcon Data="{StaticResource IconRefresh}" Width="17" Height="17" />
+            </Button>
+        </Grid>
+
+        <!-- Toolbar -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,210,42" ColumnSpacing="10">
+            <Border Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1"
+                    CornerRadius="10" Height="40">
+                <Grid ColumnDefinitions="38,*">
+                    <PathIcon Data="{StaticResource IconSearch}" Width="15" Height="15"
+                              Foreground="{DynamicResource TextMutedBrush}"
+                              HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <TextBox Grid.Column="1" Text="{Binding SearchText, Mode=TwoWay}"
+                             PlaceholderText="Search mods, levels, characters…"
+                             Background="Transparent" BorderThickness="0"
+                             VerticalContentAlignment="Center" Padding="0,8,12,8" />
+                </Grid>
+            </Border>
+            <ComboBox Grid.Column="1" ItemsSource="{Binding SortOptions}"
+                      SelectedItem="{Binding SelectedSort, Mode=TwoWay}"
+                      VerticalAlignment="Center" />
+            <Button Grid.Column="2" Classes="icon" Command="{Binding RefreshCommand}"
+                    ToolTip.Tip="Refresh">
+                <PathIcon Data="{StaticResource IconDownload}" Width="16" Height="16" />
+            </Button>
+        </Grid>
+
+        <!-- Status bar -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="10">
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <TextBlock Text="{Binding StatusText}" Classes="caption" VerticalAlignment="Center" />
+                <Border Width="3" Height="3" CornerRadius="2"
+                        Background="{DynamicResource TextMutedBrush}" IsVisible="{Binding ShowResults}"
+                        VerticalAlignment="Center" />
+                <TextBlock Text="Click a card for screenshots, files and install."
+                           Classes="caption" VerticalAlignment="Center" IsVisible="{Binding ShowResults}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4"
+                        IsVisible="{Binding ShowResults}">
+                <Button Classes="icon" Command="{Binding PreviousPageCommand}" ToolTip.Tip="Previous page">
+                    <PathIcon Data="{StaticResource IconLeft}" Width="15" Height="15" />
+                </Button>
+                <TextBlock Text="{Binding PageText}" Classes="caption" VerticalAlignment="Center"
+                           MinWidth="86" TextAlignment="Center" />
+                <Button Classes="icon" Command="{Binding NextPageCommand}" ToolTip.Tip="Next page">
+                    <PathIcon Data="{StaticResource IconRight}" Width="15" Height="15" />
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- Content -->
+        <Panel Grid.Row="3">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                          IsVisible="{Binding ShowResults}">
+                <ItemsControl ItemsSource="{Binding Items}" Margin="0,0,0,4">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Classes="card" Width="256" Height="272" Margin="0,0,14,14"
+                                    Click="OpenDetails">
+                                <Grid RowDefinitions="142,*">
+                                    <Panel Background="{DynamicResource SurfaceAltBrush}" ClipToBounds="True">
+                                        <Image Source="{Binding Thumbnail}" Stretch="UniformToFill"
+                                               IsVisible="{Binding HasThumbnail}" />
+                                        <StackPanel IsVisible="{Binding ShowPlaceholder}"
+                                                    VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                    Spacing="6">
+                                            <Border Width="44" Height="44" CornerRadius="12"
+                                                    Background="{DynamicResource AccentSoftBrush}"
+                                                    HorizontalAlignment="Center">
+                                                <TextBlock Text="{Binding Initial}" Classes="h2"
+                                                           Foreground="{DynamicResource AccentBrush}"
+                                                           HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center" />
+                                            </Border>
+                                            <TextBlock Text="No screenshot" Classes="caption"
+                                                       HorizontalAlignment="Center" />
+                                        </StackPanel>
+                                        <Border IsVisible="{Binding IsInstalled}" Classes="pill"
+                                                Background="#0E2A1B" BorderBrush="#2A6B42"
+                                                HorizontalAlignment="Left" VerticalAlignment="Top"
+                                                Margin="9">
+                                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                                <PathIcon Data="{StaticResource IconCheck}" Width="11" Height="11"
+                                                          Foreground="{DynamicResource AccentBrush}" />
+                                                <TextBlock Text="INSTALLED" FontSize="9.5" FontWeight="Bold"
+                                                           LetterSpacing="0.6"
+                                                           Foreground="{DynamicResource AccentBrush}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Panel>
+
+                                    <StackPanel Grid.Row="1" Margin="13,10,13,11" Spacing="5">
+                                        <TextBlock Text="{Binding Name}" Classes="mod-title" />
+                                        <TextBlock Text="{Binding Author}" Classes="caption"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
+                                            <TextBlock Text="{Binding Category}" Classes="caption"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="1" Text="{Binding VersionText}"
+                                                       Classes="caption" Margin="8,0,0,0" />
+                                        </Grid>
+                                        <TextBlock Text="{Binding AddedText}" Classes="caption"
+                                                   Foreground="{DynamicResource TextMutedBrush}" />
+                                    </StackPanel>
+                                </Grid>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- Loading -->
+            <StackPanel IsVisible="{Binding IsLoading}" VerticalAlignment="Center"
+                        HorizontalAlignment="Center" Spacing="14" Width="280">
+                <ProgressBar IsIndeterminate="True" Height="4" />
+                <TextBlock Text="Asking GameBanana for the latest mods…"
+                           Classes="caption" HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <!-- Error -->
+            <Border IsVisible="{Binding ShowErrorState}" Classes="card" MaxWidth="440"
+                    VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel Spacing="10" HorizontalAlignment="Center">
+                    <PathIcon Data="{StaticResource IconWarning}" Width="26" Height="26"
+                              Foreground="{DynamicResource WarningBrush}"
+                              HorizontalAlignment="Center" />
+                    <TextBlock Text="GameBanana is not answering" Classes="h2"
+                               HorizontalAlignment="Center" />
+                    <TextBlock Text="{Binding ErrorMessage}" Classes="body" TextAlignment="Center" />
+                    <Button Classes="primary" Content="Try again" HorizontalAlignment="Center"
+                            Command="{Binding RetryCommand}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Empty -->
+            <Border IsVisible="{Binding ShowEmptyState}" Classes="card" MaxWidth="440"
+                    VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel Spacing="8" HorizontalAlignment="Center">
+                    <PathIcon Data="{StaticResource IconSearch}" Width="26" Height="26"
+                              Foreground="{DynamicResource TextMutedBrush}"
+                              HorizontalAlignment="Center" />
+                    <TextBlock Text="Nothing matched" Classes="h2" HorizontalAlignment="Center" />
+                    <TextBlock Text="Try a shorter search, or clear the box to browse every mod."
+                               Classes="body" TextAlignment="Center" />
+                </StackPanel>
+            </Border>
+        </Panel>
+    </Grid>
+</UserControl>

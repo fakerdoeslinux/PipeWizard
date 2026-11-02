@@ -1,0 +1,103 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PipeWizard.Views.MainWindow"
+        Title="PipeWizard"
+        Icon="/Assets/pipewizard.ico"
+        Width="1240" Height="820"
+        MinWidth="1040" MinHeight="680"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource BgBrush}">
+
+    <Grid ColumnDefinitions="236,*">
+        <!-- Sidebar -->
+        <Border Grid.Column="0" Background="{DynamicResource SidebarBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="0,0,1,0">
+            <Grid RowDefinitions="Auto,*,Auto" Margin="14,22,14,16">
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Margin="6,0,0,26">
+                    <Border Width="42" Height="42" CornerRadius="12" ClipToBounds="True">
+                        <Image Source="/Assets/pipewizard.png" Stretch="UniformToFill" />
+                    </Border>
+                    <StackPanel VerticalAlignment="Center" Spacing="1">
+                        <TextBlock Text="PipeWizard" FontSize="19" FontWeight="Bold" LetterSpacing="-0.4" />
+                        <TextBlock Text="NSMBW native port" Classes="caption" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Spacing="8">
+                    <TextBlock Text="LIBRARY" Classes="label" Margin="12,0,0,2" />
+                    <ListBox Classes="nav" SelectedIndex="{Binding SelectedNavIndex, Mode=TwoWay}">
+                        <ListBoxItem>
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="{StaticResource IconHome}" Width="18" Height="18"
+                                          Foreground="{Binding $parent[ListBoxItem].Foreground}" />
+                                <TextBlock Text="Home" FontSize="13.5"
+                                           Foreground="{Binding $parent[ListBoxItem].Foreground}" />
+                            </StackPanel>
+                        </ListBoxItem>
+                        <ListBoxItem>
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="{StaticResource IconMods}" Width="18" Height="18"
+                                          Foreground="{Binding $parent[ListBoxItem].Foreground}" />
+                                <TextBlock Text="Browse mods" FontSize="13.5"
+                                           Foreground="{Binding $parent[ListBoxItem].Foreground}" />
+                            </StackPanel>
+                        </ListBoxItem>
+                        <ListBoxItem>
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="{StaticResource IconLibrary}" Width="18" Height="18"
+                                          Foreground="{Binding $parent[ListBoxItem].Foreground}" />
+                                <TextBlock Text="Installed" FontSize="13.5"
+                                           Foreground="{Binding $parent[ListBoxItem].Foreground}" />
+                            </StackPanel>
+                        </ListBoxItem>
+                        <ListBoxItem>
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="{StaticResource IconSettings}" Width="18" Height="18"
+                                          Foreground="{Binding $parent[ListBoxItem].Foreground}" />
+                                <TextBlock Text="Settings" FontSize="13.5"
+                                           Foreground="{Binding $parent[ListBoxItem].Foreground}" />
+                            </StackPanel>
+                        </ListBoxItem>
+                    </ListBox>
+                </StackPanel>
+
+                <StackPanel Grid.Row="2" Spacing="12">
+                    <Border Background="{DynamicResource SurfaceBrush}"
+                            BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1"
+                            CornerRadius="12" Padding="12">
+                        <StackPanel Spacing="9">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                <Panel Width="9" Height="9" VerticalAlignment="Center">
+                                    <Ellipse Fill="{DynamicResource SuccessBrush}" IsVisible="{Binding StatusOk}" />
+                                    <Ellipse Fill="{DynamicResource WarningBrush}" IsVisible="{Binding !StatusOk}" />
+                                </Panel>
+                                <TextBlock Grid.Column="1" Text="{Binding GameStatusText}"
+                                           FontSize="12.5" FontWeight="SemiBold" />
+                            </Grid>
+                            <TextBlock Text="{Binding GameStatusDetail}" Classes="caption"
+                                       TextWrapping="Wrap" LineHeight="16" />
+                            <Button Classes="primary" HorizontalAlignment="Stretch" MinHeight="36"
+                                    Padding="12,8" Command="{Binding Home.PlayCommand}"
+                                    IsEnabled="{Binding PlayEnabled}">
+                                <StackPanel Orientation="Horizontal" Spacing="7" HorizontalAlignment="Center">
+                                    <PathIcon Data="{StaticResource IconPlay}" Width="14" Height="14"
+                                              Foreground="{Binding $parent[Button].Foreground}" />
+                                    <TextBlock Text="{Binding PlayLabel}" FontWeight="SemiBold" FontSize="12.5"
+                                               Foreground="{Binding $parent[Button].Foreground}" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                    <TextBlock Text="PipeWizard 1.0 · GPL-3.0" Classes="caption" HorizontalAlignment="Center" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Page host -->
+        <Border Grid.Column="1" Background="{DynamicResource BgBrush}">
+            <ContentControl Content="{Binding CurrentPage}" Margin="26,22,26,20"
+                            HorizontalContentAlignment="Stretch"
+                            VerticalContentAlignment="Stretch" />
+        </Border>
+    </Grid>
+</Window>

@@ -1,0 +1,35 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PipeWizard.Views.ConfirmWindow"
+        Title="{Binding Header}"
+        Width="440" Height="260"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BgBrush}">
+
+    <Grid RowDefinitions="Auto,*,Auto" Margin="24,20,24,18" RowSpacing="14">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="11">
+            <Border Width="36" Height="36" CornerRadius="10"
+                    Background="{DynamicResource DangerSoftBrush}"
+                    BorderBrush="#4A2020" BorderThickness="1">
+                <PathIcon Data="{StaticResource IconWarning}" Width="17" Height="17"
+                          Foreground="{DynamicResource RedBrush}" />
+            </Border>
+            <StackPanel VerticalAlignment="Center" Spacing="1">
+                <TextBlock Text="{Binding Header}" Classes="h2" />
+                <TextBlock Text="This cannot be undone." Classes="caption" />
+            </StackPanel>
+        </StackPanel>
+
+        <TextBlock Grid.Row="1" Text="{Binding Message}" Classes="body"
+                   TextWrapping="Wrap" VerticalAlignment="Center" />
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="9"
+                    HorizontalAlignment="Right" VerticalAlignment="Center">
+            <Button Content="Cancel" Click="Cancel" IsCancel="True" />
+            <Button Classes="primary" Background="{DynamicResource RedBrush}"
+                    Foreground="White" Content="{Binding ConfirmLabel}"
+                    Click="Confirm" IsDefault="True" />
+        </StackPanel>
+    </Grid>
+</Window>

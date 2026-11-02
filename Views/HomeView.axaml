@@ -1,0 +1,261 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="PipeWizard.Views.HomeView">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Spacing="16" Margin="0,0,8,4">
+
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <StackPanel Spacing="3">
+                    <TextBlock Text="Home" Classes="h1" />
+                    <TextBlock Text="Your New Super Mario Bros. Wii setup at a glance."
+                               Classes="subtitle" />
+                </StackPanel>
+                <Button Grid.Column="1" Classes="icon" VerticalAlignment="Center"
+                        Command="{Binding AutoDetectCommand}" ToolTip.Tip="Scan the usual locations again">
+                    <PathIcon Data="{StaticResource IconRefresh}" Width="17" Height="17" />
+                </Button>
+            </Grid>
+
+            <!-- Hero -->
+            <Border Background="{DynamicResource HeroGradient}"
+                    BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1"
+                    CornerRadius="16" Padding="26,24">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="22">
+                    <StackPanel Spacing="10" VerticalAlignment="Center">
+                        <Border Classes="pill" HorizontalAlignment="Left">
+                            <StackPanel Orientation="Horizontal" Spacing="7">
+                                <Ellipse Width="7" Height="7" VerticalAlignment="Center"
+                                         Fill="{DynamicResource SuccessBrush}" />
+                                <TextBlock Text="NATIVE PC PORT" Classes="label" FontSize="10" />
+                            </StackPanel>
+                        </Border>
+                        <TextBlock Text="{Binding HeroTitle}" Classes="h1" FontSize="30" />
+                        <TextBlock Text="{Binding HeroSubtitle}" Classes="subtitle"
+                                   TextWrapping="Wrap" MaxWidth="560" />
+                        <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,8,0,0">
+                            <Button Classes="play" Command="{Binding PlayCommand}"
+                                    IsEnabled="{Binding CanPlay}">
+                                <StackPanel Orientation="Horizontal" Spacing="9">
+                                    <PathIcon Data="{StaticResource IconPlay}" Width="18" Height="18"
+                                              Foreground="{Binding $parent[Button].Foreground}" />
+                                    <TextBlock Text="{Binding PlayLabel}" FontSize="16" FontWeight="SemiBold"
+                                               Foreground="{Binding $parent[Button].Foreground}" />
+                                </StackPanel>
+                            </Button>
+                            <Button Classes="ghost" Command="{Binding BrowseModsCommand}"
+                                    VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Spacing="7">
+                                    <PathIcon Data="{StaticResource IconMods}" Width="15" Height="15"
+                                              Foreground="{Binding $parent[Button].Foreground}" />
+                                    <TextBlock Text="Browse mods" Foreground="{Binding $parent[Button].Foreground}" />
+                                </StackPanel>
+                            </Button>
+                            <Button Classes="ghost" Command="{Binding ManageModsCommand}"
+                                    VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Spacing="7">
+                                    <PathIcon Data="{StaticResource IconLibrary}" Width="15" Height="15"
+                                              Foreground="{Binding $parent[Button].Foreground}" />
+                                    <TextBlock Text="Manage mods" Foreground="{Binding $parent[Button].Foreground}" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Rotating pipe illustration -->
+                    <Border Grid.Column="1" Width="150" Height="150" CornerRadius="75"
+                            Background="#0A1611" BorderBrush="#1E3A2A" BorderThickness="1"
+                            VerticalAlignment="Center">
+                        <Canvas Width="150" Height="150">
+                            <Canvas.RenderTransform>
+                                <RotateTransform Angle="0" CenterX="75" CenterY="75" />
+                            </Canvas.RenderTransform>
+                            <Rectangle Canvas.Left="57" Canvas.Top="52" Width="36" Height="70"
+                                       Fill="#2EAF60" RadiusX="5" RadiusY="5" />
+                            <Rectangle Canvas.Left="47" Canvas.Top="38" Width="56" Height="22"
+                                       Fill="#38C972" RadiusX="7" RadiusY="7" />
+                            <Rectangle Canvas.Left="67" Canvas.Top="56" Width="9" Height="60"
+                                       Fill="#6CF2A4" RadiusX="4" RadiusY="4" />
+                            <Rectangle Canvas.Left="96" Canvas.Top="56" Width="6" Height="60"
+                                       Fill="#1E7E49" RadiusX="3" RadiusY="3" />
+                            <Ellipse Canvas.Left="50" Canvas.Top="40" Width="46" Height="10"
+                                     Fill="#0B2A1B" Opacity="0.55" />
+                        </Canvas>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- Launch message -->
+            <Border IsVisible="{Binding HasLaunchMessage}" Classes="inset" Padding="12,10"
+                    BorderBrush="{DynamicResource BorderStrongBrush}">
+                <StackPanel Orientation="Horizontal" Spacing="9">
+                    <PathIcon Data="{StaticResource IconWarning}" Width="15" Height="15"
+                              IsVisible="{Binding LaunchMessageIsError}"
+                              Foreground="{DynamicResource RedBrush}" VerticalAlignment="Center" />
+                    <PathIcon Data="{StaticResource IconCheck}" Width="15" Height="15"
+                              IsVisible="{Binding !LaunchMessageIsError}"
+                              Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding LaunchMessage}" TextWrapping="Wrap" FontSize="12.5"
+                               Foreground="{DynamicResource TextBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Setup -->
+            <StackPanel Spacing="9">
+                <TextBlock Text="SETUP" Classes="label" />
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12">
+                    <!-- Port -->
+                    <Border Grid.Column="0" Classes="card" Padding="16">
+                        <StackPanel Spacing="9">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Spacing="2">
+                                    <TextBlock Text="Port build" Classes="label" />
+                                    <TextBlock Text="{Binding PortStatus}" Classes="h3" />
+                                </StackPanel>
+                                <Panel Grid.Column="1" Width="9" Height="9" VerticalAlignment="Center">
+                                    <Ellipse Fill="{DynamicResource AccentBrush}"
+                                             IsVisible="{Binding IsPortOk}" />
+                                    <Ellipse Fill="{DynamicResource WarningBrush}"
+                                             IsVisible="{Binding !IsPortOk}" />
+                                </Panel>
+                            </Grid>
+                            <TextBlock Text="{Binding PortPath}" Classes="path" />
+                            <Button Classes="ghost" HorizontalAlignment="Left" Padding="0"
+                                    Click="PickPort">
+                                <TextBlock Text="Change location" Classes="accent" FontSize="12" />
+                            </Button>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Game -->
+                    <Border Grid.Column="1" Classes="card" Padding="16">
+                        <StackPanel Spacing="9">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Spacing="2">
+                                    <TextBlock Text="Extracted disc" Classes="label" />
+                                    <TextBlock Text="{Binding GameStatus}" Classes="h3" />
+                                </StackPanel>
+                            </Grid>
+                            <TextBlock Text="{Binding GamePath}" Classes="path" />
+                            <Button Classes="ghost" HorizontalAlignment="Left" Padding="0"
+                                    Click="PickGameFolder">
+                                <TextBlock Text="Choose folder" Classes="accent" FontSize="12" />
+                            </Button>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Config -->
+                    <Border Grid.Column="2" Classes="card" Padding="16">
+                        <StackPanel Spacing="9">
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="Config.toml" Classes="label" />
+                                <TextBlock Text="{Binding ConfigStatus}" Classes="h3" />
+                            </StackPanel>
+                            <TextBlock Text="{Binding ConfigPath}" Classes="path" />
+                            <Button Classes="ghost" HorizontalAlignment="Left" Padding="0"
+                                    Command="{Binding OpenConfigCommand}">
+                                <TextBlock Text="Open config" Classes="accent" FontSize="12" />
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <Border IsVisible="{Binding HasGameError}" Classes="inset"
+                        Background="{DynamicResource DangerSoftBrush}"
+                        BorderBrush="#4A2020" Padding="12,9">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <PathIcon Data="{StaticResource IconWarning}" Width="14" Height="14"
+                                  Foreground="{DynamicResource RedBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding GameError}" TextWrapping="Wrap" FontSize="12"
+                                   Foreground="{DynamicResource RedBrush}" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- Enabled mods + quick options -->
+            <Grid ColumnDefinitions="*,340" ColumnSpacing="12">
+                <Border Grid.Column="0" Classes="card">
+                    <StackPanel Spacing="12">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="Enabled mods" Classes="h2" />
+                                <TextBlock Text="{Binding ModsSummary}" Classes="caption" />
+                            </StackPanel>
+                            <Button Grid.Column="1" Classes="ghost" Command="{Binding ManageModsCommand}">
+                                <TextBlock Text="Manage" Classes="accent" FontSize="12" />
+                            </Button>
+                        </Grid>
+
+                        <ItemsControl ItemsSource="{Binding EnabledMods}"
+                                      IsVisible="{Binding HasEnabledMods}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Classes="inset" Padding="11,9" Margin="0,0,0,6">
+                                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                            <Border Width="26" Height="26" CornerRadius="7"
+                                                    Background="{DynamicResource AccentSoftBrush}"
+                                                    VerticalAlignment="Center">
+                                                <PathIcon Data="{StaticResource IconMods}" Width="13" Height="13"
+                                                          Foreground="{DynamicResource AccentBrush}" />
+                                            </Border>
+                                            <StackPanel Grid.Column="1" Spacing="1" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}" FontSize="12.5"
+                                                           FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Text="{Binding KindLabel}" Classes="caption" />
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="2" Text="{Binding PriorityText}"
+                                                       Classes="caption" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Border Classes="inset" IsVisible="{Binding !HasEnabledMods}" Padding="16">
+                            <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                <TextBlock Text="No mods enabled" Classes="h3" HorizontalAlignment="Center" />
+                                <TextBlock Text="Browse GameBanana and install one in a click."
+                                           Classes="caption" HorizontalAlignment="Center" />
+                                <Button Classes="primary" HorizontalAlignment="Center" Margin="0,8,0,0"
+                                        Command="{Binding BrowseModsCommand}" Content="Browse mods" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card">
+                    <StackPanel Spacing="14">
+                        <TextBlock Text="Quick options" Classes="h2" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Spacing="1">
+                                <TextBlock Text="MangoHud" FontSize="13" FontWeight="SemiBold" />
+                                <TextBlock Text="Show a performance overlay while playing."
+                                           Classes="caption" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1" IsChecked="{Binding MangoHud, Mode=TwoWay}"
+                                          VerticalAlignment="Center" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Spacing="1">
+                                <TextBlock Text="FPS counter" FontSize="13" FontWeight="SemiBold" />
+                                <TextBlock Text="Draws the port's frame counter in game."
+                                           Classes="caption" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowFps, Mode=TwoWay}"
+                                          VerticalAlignment="Center" />
+                        </Grid>
+                        <Border Height="1" Background="{DynamicResource CardBorderBrush}" />
+                        <Button Classes="ghost" HorizontalAlignment="Stretch"
+                                Command="{Binding OpenSettingsCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="7" HorizontalAlignment="Center">
+                                <PathIcon Data="{StaticResource IconSettings}" Width="14" Height="14"
+                                          Foreground="{Binding $parent[Button].Foreground}" />
+                                <TextBlock Text="All settings" Foreground="{Binding $parent[Button].Foreground}" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,138 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="PipeWizard.Views.InstalledView">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="14">
+
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <StackPanel Spacing="3">
+                <TextBlock Text="Installed" Classes="h1" />
+                <TextBlock Text="{Binding CountText}" Classes="subtitle" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Button Classes="ghost" Command="{Binding OpenModsFolderCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <PathIcon Data="{StaticResource IconFolder}" Width="14" Height="14"
+                                  Foreground="{Binding $parent[Button].Foreground}" />
+                        <TextBlock Text="Mods folder" Foreground="{Binding $parent[Button].Foreground}" />
+                    </StackPanel>
+                </Button>
+                <Button Classes="primary" Command="{Binding BrowseModsCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <PathIcon Data="{StaticResource IconDownload}" Width="14" Height="14"
+                                  Foreground="{Binding $parent[Button].Foreground}" />
+                        <TextBlock Text="Get more mods" Foreground="{Binding $parent[Button].Foreground}" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="1" Classes="inset" Padding="12,9">
+            <StackPanel Orientation="Horizontal" Spacing="9">
+                <PathIcon Data="{StaticResource IconInfo}" Width="14" Height="14"
+                          Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                <TextBlock Classes="caption" TextWrapping="Wrap" VerticalAlignment="Center"
+                           Text="Earlier mods win: when two mods replace the same file, the one higher in this list is used. Use the arrows to change priority, then restart the game." />
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="2" Classes="inset" Padding="12,9" IsVisible="{Binding HasStatus}"
+                BorderBrush="{DynamicResource BorderStrongBrush}">
+            <StackPanel Orientation="Horizontal" Spacing="9">
+                <PathIcon Data="{StaticResource IconWarning}" Width="14" Height="14"
+                          IsVisible="{Binding StatusIsError}"
+                          Foreground="{DynamicResource RedBrush}" VerticalAlignment="Center" />
+                <PathIcon Data="{StaticResource IconCheck}" Width="14" Height="14"
+                          IsVisible="{Binding !StatusIsError}"
+                          Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" FontSize="12.5"
+                           Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" />
+            </StackPanel>
+        </Border>
+
+        <Panel Grid.Row="3">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                          IsVisible="{Binding HasMods}">
+                <ItemsControl ItemsSource="{Binding Mods}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Classes="card" Padding="14,12" Margin="0,0,0,9">
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14">
+                                    <ToggleSwitch Grid.Column="0" IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                                  VerticalAlignment="Center"
+                                                  ToolTip.Tip="Enable or disable this mod" />
+
+                                    <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Text="{Binding Name}" Classes="h3"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <Border Classes="pill" Padding="7,2" IsVisible="{Binding IsRiivolution}">
+                                                <TextBlock Text="Riivolution" FontSize="9.5" FontWeight="Bold"
+                                                           LetterSpacing="0.4"
+                                                           Foreground="{DynamicResource AccentBrush}" />
+                                            </Border>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="7">
+                                            <TextBlock Text="{Binding Author}" Classes="caption" />
+                                            <TextBlock Text="·" Classes="caption" />
+                                            <TextBlock Text="{Binding VersionText}" Classes="caption" />
+                                            <TextBlock Text="·" Classes="caption" />
+                                            <TextBlock Text="{Binding KindLabel}" Classes="caption" />
+                                            <TextBlock Text="·" Classes="caption" />
+                                            <TextBlock Text="{Binding SizeText}" Classes="caption" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4"
+                                                VerticalAlignment="Center">
+                                        <Border Classes="pill" IsVisible="{Binding IsEnabled}"
+                                                VerticalAlignment="Center" Margin="0,0,4,0">
+                                            <TextBlock Text="{Binding PriorityLabel}" FontSize="10.5"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource AccentBrush}" />
+                                        </Border>
+                                        <Button Classes="icon" Command="{Binding MoveUpCommand}"
+                                                IsEnabled="{Binding CanMoveUp}" ToolTip.Tip="Higher priority">
+                                            <PathIcon Data="{StaticResource IconUp}" Width="14" Height="14" />
+                                        </Button>
+                                        <Button Classes="icon" Command="{Binding MoveDownCommand}"
+                                                IsEnabled="{Binding CanMoveDown}" ToolTip.Tip="Lower priority">
+                                            <PathIcon Data="{StaticResource IconDown}" Width="14" Height="14" />
+                                        </Button>
+                                        <Button Classes="icon" Command="{Binding OpenFolderCommand}"
+                                                ToolTip.Tip="Open mod folder">
+                                            <PathIcon Data="{StaticResource IconFolder}" Width="14" Height="14" />
+                                        </Button>
+                                        <Button Classes="danger-ghost" Command="{Binding RemoveCommand}"
+                                                ToolTip.Tip="Remove mod">
+                                            <PathIcon Data="{StaticResource IconTrash}" Width="14" Height="14"
+                                                      Foreground="{DynamicResource RedBrush}" />
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <Border IsVisible="{Binding IsEmpty}" Classes="card" MaxWidth="460"
+                    VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel Spacing="10" HorizontalAlignment="Center">
+                    <Border Width="52" Height="52" CornerRadius="14"
+                            Background="{DynamicResource SurfaceAltBrush}"
+                            BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1"
+                            HorizontalAlignment="Center">
+                        <PathIcon Data="{StaticResource IconLibrary}" Width="22" Height="22"
+                                  Foreground="{DynamicResource TextMutedBrush}" />
+                    </Border>
+                    <TextBlock Text="No mods installed yet" Classes="h2" HorizontalAlignment="Center" />
+                    <TextBlock Classes="body" TextAlignment="Center" MaxWidth="330"
+                               Text="Browse GameBanana, pick a mod and PipeWizard will unpack it and add it to the port's overlay list for you." />
+                    <Button Classes="primary" Content="Browse GameBanana" HorizontalAlignment="Center"
+                            Command="{Binding BrowseModsCommand}" />
+                </StackPanel>
+            </Border>
+        </Panel>
+    </Grid>
+</UserControl>
