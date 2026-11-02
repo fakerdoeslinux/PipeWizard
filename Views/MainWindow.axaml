@@ -88,7 +88,7 @@
                             </Button>
                         </StackPanel>
                     </Border>
-                    <TextBlock Text="PipeWizard 1.0.1 · GPL-3.0" Classes="caption" HorizontalAlignment="Center" />
+                    <TextBlock Text="PipeWizard 1.0.2 · GPL-3.0" Classes="caption" HorizontalAlignment="Center" />
                 </StackPanel>
             </Grid>
         </Border>

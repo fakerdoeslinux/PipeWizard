@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using PipeWizard.ViewModels;
+using PipeWizard.Services;
 
 namespace PipeWizard.Views;
 
@@ -17,6 +18,15 @@ public partial class ModsView : UserControl
             sender is Control { DataContext: ModCardViewModel card })
         {
             viewModel.RequestDetails(card);
+        }
+    }
+
+    private void OpenFeaturedWip(object? sender, RoutedEventArgs e)
+    {
+        var error = PlatformService.OpenPath("https://gamebanana.com/wips/65286");
+        if (error is not null && DataContext is ModsViewModel viewModel)
+        {
+            viewModel.ShowExternalLinkError(error);
         }
     }
 }

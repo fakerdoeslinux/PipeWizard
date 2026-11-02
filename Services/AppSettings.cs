@@ -27,6 +27,9 @@ public sealed class AppSettings
     [JsonPropertyName("windowHeight")]
     public int WindowHeight { get; set; } = 800;
 
+    [JsonPropertyName("firstRunSetupPrompted")]
+    public bool FirstRunSetupPrompted { get; set; }
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         WriteIndented = true,

@@ -62,6 +62,7 @@ public static class PortService
             Path.Combine(home, "NSMB-Wii-Native-Port", "nsmbw-local-build"),
             Path.Combine(home, "Documents", "nsmbw-rev2", "src", "native-build"),
             Path.Combine(home, "Documents", "NSMB-Wii-Native-Port", "native-build"),
+            Path.Combine(AppPaths.NativePortWorkspace, "nsmbw-local-build"),
         };
 
         if (OperatingSystem.IsWindows())
@@ -159,10 +160,9 @@ public static class PortService
     {
         if (!string.IsNullOrWhiteSpace(settings.GameFolder))
         {
-            var configured = ValidateGameFolder(settings.GameFolder);
-            if (configured.IsValid)
+            if (NormalizeGameFolder(settings.GameFolder) is { } configured)
             {
-                return NormalizePath(settings.GameFolder);
+                return configured;
             }
         }
 
@@ -170,10 +170,9 @@ public static class PortService
         if (!string.IsNullOrWhiteSpace(fromConfig))
         {
             var candidate = ResolveRelativeToConfig(fromConfig, config.Path);
-            var validation = ValidateGameFolder(candidate);
-            if (validation.IsValid)
+            if (NormalizeGameFolder(candidate) is { } normalized)
             {
-                return candidate;
+                return normalized;
             }
         }
 
@@ -183,9 +182,9 @@ public static class PortService
             foreach (var name in new[] { "game", "DATA" })
             {
                 var candidate = Path.Combine(directory, name);
-                if (ValidateGameFolder(candidate).IsValid)
+                if (NormalizeGameFolder(candidate) is { } normalized)
                 {
-                    return candidate;
+                    return normalized;
                 }
             }
 
@@ -193,9 +192,9 @@ public static class PortService
             if (parent is not null)
             {
                 var candidate = Path.Combine(parent, "game");
-                if (ValidateGameFolder(candidate).IsValid)
+                if (NormalizeGameFolder(candidate) is { } normalized)
                 {
-                    return candidate;
+                    return normalized;
                 }
             }
         }
@@ -210,24 +209,13 @@ public static class PortService
             return GameValidation.Invalid("No game folder selected.");
         }
 
-        var path = NormalizePath(folder);
-        if (!Directory.Exists(path))
+        var path = NormalizeGameFolder(folder);
+        if (path is null)
         {
-            return GameValidation.Invalid("That folder does not exist.");
-        }
-
-        if (!IsDiscRoot(path))
-        {
-            var nested = Path.Combine(path, "DATA");
-            if (IsDiscRoot(nested))
-            {
-                path = nested;
-            }
-            else
-            {
-                return GameValidation.Invalid(
+            return string.IsNullOrWhiteSpace(folder) || !Directory.Exists(NormalizePath(folder))
+                ? GameValidation.Invalid("That folder does not exist.")
+                : GameValidation.Invalid(
                     "Not an extracted game: the folder needs sys/ and files/ (use Dolphin's Extract Entire Disc).");
-            }
         }
 
         try
@@ -274,6 +262,23 @@ public static class PortService
         Directory.Exists(Path.Combine(path, "files")) &&
         File.Exists(Path.Combine(path, "sys", "boot.bin")) &&
         File.Exists(Path.Combine(path, "sys", "main.dol"));
+
+    public static string? NormalizeGameFolder(string? folder)
+    {
+        if (string.IsNullOrWhiteSpace(folder))
+        {
+            return null;
+        }
+
+        var path = NormalizePath(folder);
+        if (IsDiscRoot(path))
+        {
+            return path;
+        }
+
+        var nested = Path.Combine(path, "DATA");
+        return IsDiscRoot(nested) ? NormalizePath(nested) : null;
+    }
 
     public static string NormalizePath(string path)
     {

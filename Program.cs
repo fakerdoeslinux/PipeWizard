@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Text.Json;
 using Avalonia;
 using PipeWizard.Models;
@@ -47,6 +48,32 @@ internal static class Program
         {
             Console.Error.WriteLine("PipeWizard self-test failed.");
             return 1;
+        }
+
+        var temporaryGame = Path.Combine(
+            Path.GetTempPath(), "pipewizard-self-test-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            var dataFolder = Path.Combine(temporaryGame, "DATA");
+            Directory.CreateDirectory(Path.Combine(dataFolder, "files"));
+            Directory.CreateDirectory(Path.Combine(dataFolder, "sys"));
+            File.WriteAllBytes(Path.Combine(dataFolder, "sys", "boot.bin"), new byte[8]);
+            File.WriteAllBytes(Path.Combine(dataFolder, "sys", "main.dol"), Array.Empty<byte>());
+            if (!string.Equals(
+                    PortService.NormalizeGameFolder(temporaryGame),
+                    Path.GetFullPath(dataFolder),
+                    OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
+            {
+                Console.Error.WriteLine("PipeWizard game-folder normalization self-test failed.");
+                return 1;
+            }
+        }
+        finally
+        {
+            if (Directory.Exists(temporaryGame))
+            {
+                Directory.Delete(temporaryGame, recursive: true);
+            }
         }
 
         Console.WriteLine("PipeWizard self-test passed.");

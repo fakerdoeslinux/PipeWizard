@@ -30,6 +30,7 @@ public sealed class ModsViewModel : ObservableObject
     private int _currentPage = 1;
     private int _totalPages = 1;
     private int _totalCount;
+    private string _externalLinkError = string.Empty;
 
     public ModsViewModel(MainWindowViewModel shell)
     {
@@ -131,6 +132,20 @@ public sealed class ModsViewModel : ObservableObject
         private set => SetProperty(ref _errorMessage, value);
     }
 
+    public string ExternalLinkError
+    {
+        get => _externalLinkError;
+        private set
+        {
+            if (SetProperty(ref _externalLinkError, value))
+            {
+                OnPropertyChanged(nameof(HasExternalLinkError));
+            }
+        }
+    }
+
+    public bool HasExternalLinkError => !string.IsNullOrWhiteSpace(ExternalLinkError);
+
     public int CurrentPage
     {
         get => _currentPage;
@@ -204,6 +219,11 @@ public sealed class ModsViewModel : ObservableObject
     public ICommand NextPageCommand { get; }
     public ICommand RefreshCommand { get; }
     public ICommand RetryCommand { get; }
+
+    public void ShowExternalLinkError(string error)
+    {
+        ExternalLinkError = $"Could not open the GameBanana WIP page: {error}";
+    }
 
     public async Task LoadAsync(int page, bool forceRefresh = false)
     {

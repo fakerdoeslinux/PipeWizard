@@ -70,4 +70,5 @@ public partial class HomeView : UserControl
             viewModel.SetGameFolder(path);
         }
     }
+
 }

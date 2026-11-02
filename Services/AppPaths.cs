@@ -22,6 +22,25 @@ public static class AppPaths
 
     public static string LogFile => Path.Combine(DataDirectory, "pipewizard.log");
 
+    public static string NativePortWorkspace
+    {
+        get
+        {
+            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            if (string.IsNullOrWhiteSpace(documents))
+            {
+                documents = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                    "Documents");
+            }
+
+            return Path.Combine(documents, "PipeWizard", "NSMB-Wii-Native-Port");
+        }
+    }
+
+    public static string NativePortSourceDirectory =>
+        Path.Combine(NativePortWorkspace, "NSMB-Wii-Native-Port");
+
     public static void EnsureCreated()
     {
         Directory.CreateDirectory(DataDirectory);

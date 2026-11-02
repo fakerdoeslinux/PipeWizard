@@ -13,6 +13,31 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        Opened += OnFirstRunOpened;
+    }
+
+    private async void OnFirstRunOpened(object? sender, EventArgs e)
+    {
+        if (_viewModel is null ||
+            _viewModel.State.IsPortReady ||
+            _viewModel.State.Settings.FirstRunSetupPrompted ||
+            !_viewModel.Home.IsSetupSupported)
+        {
+            return;
+        }
+
+        _viewModel.State.Settings.FirstRunSetupPrompted = true;
+        _viewModel.State.Settings.Save();
+        try
+        {
+            await _viewModel.Home.SetupNativePortAsync();
+        }
+        catch (Exception exception)
+        {
+            Log.Error("Could not start the first-run native-port setup.", exception);
+            _viewModel.Home.ShowMessage(
+                $"Could not open the extracted-disc folder picker: {exception.Message}", true);
+        }
     }
 
     protected override void OnDataContextChanged(EventArgs e)
@@ -44,6 +69,7 @@ public partial class MainWindow : Window
     {
         if (_viewModel is not null)
         {
+            _viewModel.Home.CancelSetup();
             _viewModel.State.Settings.WindowWidth = (int)Math.Round(Width);
             _viewModel.State.Settings.WindowHeight = (int)Math.Round(Height);
             _viewModel.State.Settings.Save();

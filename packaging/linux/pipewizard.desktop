@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=PipeWizard
+Comment=Launcher and GameBanana mod manager for the NSMBW native PC port
+Exec=pipewizard
+Icon=pipewizard
+Terminal=false
+Categories=Game;
+StartupNotify=true

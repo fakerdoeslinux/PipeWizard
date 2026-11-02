@@ -51,7 +51,18 @@ jobs:
         run: cp README.md LICENSE THIRD-PARTY-NOTICES.md publish/
       - name: Package Linux app
         if: runner.os == 'Linux'
-        run: tar -czf PipeWizard-${{ matrix.rid }}.tar.gz -C publish .
+        shell: bash
+        run: |
+          tar -czf PipeWizard-${{ matrix.rid }}.tar.gz -C publish .
+          sudo apt-get update
+          sudo apt-get install -y rpm
+          bash packaging/linux/create-rpm.sh publish PipeWizard-${{ matrix.rid }}.rpm
+          curl -fL --retry 3 \
+            https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-x86_64.AppImage \
+            -o appimagetool-x86_64.AppImage
+          chmod +x appimagetool-x86_64.AppImage
+          APPIMAGETOOL="$PWD/appimagetool-x86_64.AppImage" \
+            bash packaging/linux/create-appimage.sh publish PipeWizard-${{ matrix.rid }}.AppImage
       - name: Package Windows app
         if: runner.os == 'Windows'
         run: Compress-Archive -Path publish/* -DestinationPath PipeWizard-${{ matrix.rid }}.zip
@@ -62,6 +73,14 @@ jobs:
         with:
           name: PipeWizard-${{ matrix.rid }}
           path: PipeWizard-${{ matrix.rid }}.${{ matrix.archive }}
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'Linux'
+        with:
+          name: PipeWizard-linux-installers
+          path: |
+            PipeWizard-${{ matrix.rid }}.rpm
+            PipeWizard-${{ matrix.rid }}.AppImage
           if-no-files-found: error
 
   release:

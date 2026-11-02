@@ -100,6 +100,30 @@
                 </StackPanel>
             </Border>
 
+            <Border IsVisible="{Binding ShouldOfferSourceSetup}" Classes="card" Padding="18">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="First-run native port setup" Classes="h2" />
+                    <TextBlock Text="Choose your own extracted SMNE01 disc and PipeWizard will clone the native-port source, install its .NET 8 SDK locally, download the pinned build toolchain, compile WiiCompiled, and create Config.toml. The game itself is never downloaded."
+                               Classes="subtitle" TextWrapping="Wrap" />
+                    <TextBlock Text="The compiler toolchain download is large (about 2 GB); the first build can take a long time. On Fedora, required system development libraries must already be installed."
+                               Classes="caption" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Button Classes="primary" Content="Choose game folder and build"
+                                Command="{Binding SetupNativePortCommand}"
+                                IsEnabled="{Binding IsNotSettingUp}"
+                                IsVisible="{Binding IsSetupSupported}" />
+                        <TextBlock Text="Automatic source builds are currently supported on Linux x64."
+                                   IsVisible="{Binding !IsSetupSupported}"
+                                   Classes="caption" VerticalAlignment="Center" />
+                        <Button Classes="ghost" Content="Cancel setup"
+                                Command="{Binding CancelSetupCommand}"
+                                IsVisible="{Binding IsSettingUp}" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding SetupStatus}" IsVisible="{Binding IsSettingUp}"
+                               Classes="caption" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
             <!-- Setup -->
             <StackPanel Spacing="9">
                 <TextBlock Text="SETUP" Classes="label" />

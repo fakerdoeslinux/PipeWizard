@@ -115,7 +115,7 @@ public sealed class AppState
             return validation.Error ?? "That game folder is not usable.";
         }
 
-        var normalized = PortService.NormalizePath(path);
+        var normalized = PortService.NormalizeGameFolder(path)!;
         Settings.GameFolder = normalized;
         Settings.Save();
 
@@ -129,7 +129,26 @@ public sealed class AppState
         }
 
         Refresh();
-        return string.Empty;
+        return error ?? string.Empty;
+    }
+
+    public string ConfigurePortAndGame(string portExecutable, string gameFolder)
+    {
+        var portError = SetPortExecutable(portExecutable);
+        if (portError.Length > 0)
+        {
+            return portError;
+        }
+
+        var gameError = SetGameFolder(gameFolder);
+        if (gameError.Length > 0)
+        {
+            return gameError;
+        }
+
+        return File.Exists(ConfigFile)
+            ? string.Empty
+            : $"The port was built, but Config.toml could not be created at {ConfigFile}.";
     }
 
     public string? SaveConfig()

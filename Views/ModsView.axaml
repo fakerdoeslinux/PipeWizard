@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="PipeWizard.Views.ModsView">
 
-    <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="14">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" RowSpacing="14">
 
         <!-- Header -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="14">
@@ -50,6 +50,8 @@
                         VerticalAlignment="Center" />
                 <TextBlock Text="Click a card for screenshots, files and install."
                            Classes="caption" VerticalAlignment="Center" IsVisible="{Binding ShowResults}" />
+                <TextBlock Text="{Binding ExternalLinkError}" IsVisible="{Binding HasExternalLinkError}"
+                           Classes="caption" Foreground="{DynamicResource RedBrush}" />
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4"
                         IsVisible="{Binding ShowResults}">
@@ -64,8 +66,26 @@
             </StackPanel>
         </Grid>
 
+        <Border Grid.Row="3" Classes="card" Padding="14">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="FEATURED GAMEBANANA WIP" Classes="label" />
+                    <TextBlock Text="Mario's Final Adventure Wii" Classes="h2" />
+                    <TextBlock Text="By BombKing8 · a fullmod project with 14 worlds and 95 new stages."
+                               Classes="caption" TextWrapping="Wrap" />
+                    <TextBlock Text="This is a work in progress, not an installable mod listing. Visit GameBanana for its current status and any author-provided download."
+                               Classes="caption" TextWrapping="Wrap" />
+                </StackPanel>
+                <Button Grid.Column="1" Classes="ghost" VerticalAlignment="Center"
+                        Click="OpenFeaturedWip">
+                    <TextBlock Text="View WIP on GameBanana"
+                               Foreground="{Binding $parent[Button].Foreground}" />
+                </Button>
+            </Grid>
+        </Border>
+
         <!-- Content -->
-        <Panel Grid.Row="3">
+        <Panel Grid.Row="4">
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                           IsVisible="{Binding ShowResults}">
                 <ItemsControl ItemsSource="{Binding Items}" Margin="0,0,0,4">

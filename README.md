@@ -10,8 +10,15 @@ PipeWizard is a desktop launcher and mod manager for the NSMBW native PC port. I
 - Installs Riivolution packs and disc overlays into PipeWizard's own data directory.
 - Enables, disables, and orders overlays through the port's `Config.toml`.
 - Stores launcher settings and downloads outside the game directory.
+- Features the GameBanana WIP [Mario's Final Adventure Wii](https://gamebanana.com/wips/65286); WIPs are linked to their author page and are not treated as installable mods.
 
 PipeWizard does not include the game, game data, the native port executable, or downloaded mods. You must provide your own compatible port build and legally obtained extracted disc data. GameBanana remains the source of mod listings and downloads; PipeWizard does not mirror mod files.
+
+## First-run native port setup
+
+On first launch, if PipeWizard cannot find `WiiCompiled`, it asks you to choose your own extracted SMNE01 disc folder, then automatically clones [NSMB-Wii-Native-Port](https://github.com/fakerdoeslinux/NSMB-Wii-Native-Port), installs the .NET 8 SDK in its user data directory if needed, downloads the port's pinned compiler toolchain, builds the executable, and writes `Config.toml`. Cancel the folder picker to configure an existing port manually; Home also offers a retry button. Game data is never downloaded. The source checkout and generated build are kept under `Documents/PipeWizard/NSMB-Wii-Native-Port`.
+
+Automatic source builds currently support Linux x64. The port's system development dependencies must already be installed; on Fedora these include `alsa-lib-devel`, `vulkan-loader-devel`, `libX11-devel`, `libxkbcommon-devel`, and `wayland-devel`. The compiler toolchain download is about 2 GB and the first build can take a long time. Windows/macOS users can build the port using its [install guide](https://github.com/fakerdoeslinux/NSMB-Wii-Native-Port/blob/main/INSTALL.md), then locate `WiiCompiled` in PipeWizard.
 
 ## Run from source
 
@@ -30,6 +37,9 @@ dotnet run --project PipeWizard.csproj -- --self-test
 ```
 
 Supported Rust/.NET release targets are `linux-x64`, `win-x64`, `osx-x64`, and `osx-arm64`. Use a matching host toolchain for desktop releases.
+Linux x64 releases include a `.rpm` package and an `.AppImage`, as well as the portable `.tar.gz` bundle.
+
+On Fedora, install the RPM with `sudo dnf install ./PipeWizard-linux-x64.rpm`. For the AppImage, make it executable with `chmod +x PipeWizard-linux-x64.AppImage`, then run `./PipeWizard-linux-x64.AppImage`.
 
 ## Data locations
 
