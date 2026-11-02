@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace PipeWizard.Models;
@@ -23,7 +24,7 @@ public sealed class GbModRecord
     [JsonPropertyName("_aSubCategory")] public GbCategory? SubCategory { get; set; }
     [JsonPropertyName("_aCategory")] public GbCategory? Category { get; set; }
     [JsonPropertyName("_aSuperCategory")] public GbCategory? SuperCategory { get; set; }
-    [JsonPropertyName("_aTags")] public List<GbTag>? Tags { get; set; }
+    [JsonPropertyName("_aTags")] public List<JsonElement>? Tags { get; set; }
 }
 
 public sealed class GbCategory
@@ -31,12 +32,6 @@ public sealed class GbCategory
     [JsonPropertyName("_idRow")] public int Id { get; set; }
     [JsonPropertyName("_sName")] public string Name { get; set; } = string.Empty;
     [JsonPropertyName("_sProfileUrl")] public string? ProfileUrl { get; set; }
-}
-
-public sealed class GbTag
-{
-    [JsonPropertyName("_sValue")] public string? Value { get; set; }
-    [JsonPropertyName("_sName")] public string? Name { get; set; }
 }
 
 public sealed class GbSubmitter
@@ -100,7 +95,7 @@ public sealed class GbModDetails
     [JsonPropertyName("_aCategory")] public GbCategory? Category { get; set; }
     [JsonPropertyName("_aSuperCategory")] public GbCategory? SuperCategory { get; set; }
     [JsonPropertyName("_aFiles")] public List<GbFile>? Files { get; set; }
-    [JsonPropertyName("_aTags")] public List<GbTag>? Tags { get; set; }
+    [JsonPropertyName("_aTags")] public List<JsonElement>? Tags { get; set; }
 }
 
 public sealed class GbFile
