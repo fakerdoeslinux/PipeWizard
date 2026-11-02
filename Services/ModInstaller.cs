@@ -178,6 +178,8 @@ public sealed class ModInstaller
                 return new InstallResult(false, "The archive does not look like an NSMBW mod: no Riivolution XML, files/ folder or disc folders were found.");
             }
 
+            RiivolutionConfigWriter.Prepare(payload, Directory.Exists(target) ? target : null, notes);
+
             progress?.Report(new InstallProgress(0.98, "Installing"));
             if (Directory.Exists(target))
             {

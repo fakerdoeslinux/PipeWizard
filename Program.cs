@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Xml.Linq;
 using Avalonia;
 using PipeWizard.Models;
 using PipeWizard.Services;
@@ -48,6 +49,66 @@ internal static class Program
         {
             Console.Error.WriteLine("PipeWizard self-test failed.");
             return 1;
+        }
+
+        var temporaryMod = Path.Combine(
+            Path.GetTempPath(), "pipewizard-riivolution-test-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            var riivolution = Path.Combine(temporaryMod, "riivolution");
+            Directory.CreateDirectory(riivolution);
+            File.WriteAllText(
+                Path.Combine(riivolution, "Skin.xml"),
+                """
+                <wiidisc version="1">
+                  <id game="SMN" />
+                  <options><section name="Skin"><option name="Mario">
+                    <choice name="Disabled" /><choice name="Enabled"><patch id="skin" /></choice>
+                  </option><option name="Optional Animations (optional)">
+                    <choice name="Enabled"><patch id="animation" /></choice>
+                  </option></section></options>
+                  <patch id="skin"><folder external="/Skin" disc="/" recursive="true" /></patch>
+                  <patch id="code"><memory offset="0x80000000" value="00" /></patch>
+                </wiidisc>
+                """);
+
+            var notes = new System.Collections.Generic.List<string>();
+            RiivolutionConfigWriter.Prepare(temporaryMod, null, notes);
+            var generatedConfig = Path.Combine(riivolution, "config", "SMNE.xml");
+            var generatedChoice = XDocument.Load(generatedConfig).Root?
+                .Elements("option")
+                .SingleOrDefault(option => (string?)option.Attribute("id") == "SkinMario");
+            var generatedOptionalChoice = XDocument.Load(generatedConfig).Root?
+                .Elements("option")
+                .SingleOrDefault(option => (string?)option.Attribute("id") == "SkinOptional Animations (optional)");
+            if ((string?)generatedChoice?.Attribute("default") != "2" ||
+                (string?)generatedOptionalChoice?.Attribute("default") != "0" ||
+                !File.Exists(Path.Combine(riivolution, "config", "SMNP.xml")) ||
+                !notes.Exists(note => note.Contains("does not apply memory patches", StringComparison.Ordinal)))
+            {
+                Console.Error.WriteLine("PipeWizard Riivolution option self-test failed.");
+                return 1;
+            }
+
+            File.WriteAllText(
+                generatedConfig,
+                """<riivolution version="2"><option id="SkinMario" default="0" /></riivolution>""");
+            RiivolutionConfigWriter.Prepare(temporaryMod, null, notes);
+            generatedChoice = XDocument.Load(generatedConfig).Root?
+                .Elements("option")
+                .SingleOrDefault(option => (string?)option.Attribute("id") == "SkinMario");
+            if ((string?)generatedChoice?.Attribute("default") != "0")
+            {
+                Console.Error.WriteLine("PipeWizard did not preserve a saved Riivolution choice.");
+                return 1;
+            }
+        }
+        finally
+        {
+            if (Directory.Exists(temporaryMod))
+            {
+                Directory.Delete(temporaryMod, recursive: true);
+            }
         }
 
         var temporaryGame = Path.Combine(
