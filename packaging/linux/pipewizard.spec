@@ -22,6 +22,9 @@ GameBanana mods.
 %install
 mkdir -p %{buildroot}/opt/pipewizard
 cp -a %{_sourcedir}/publish/. %{buildroot}/opt/pipewizard/
+# This optional .NET EventPipe provider needs lttng-ust, which is not available
+# from all supported Fedora repositories and is not needed to run PipeWizard.
+rm -f %{buildroot}/opt/pipewizard/libcoreclrtraceptprovider.so
 mkdir -p %{buildroot}%{_bindir}
 install -m 0755 %{_sourcedir}/pipewizard-launcher %{buildroot}%{_bindir}/pipewizard
 mkdir -p %{buildroot}%{_datadir}/applications
@@ -36,5 +39,5 @@ install -m 0644 %{_sourcedir}/pipewizard.png %{buildroot}%{_datadir}/icons/hicol
 %{_datadir}/icons/hicolor/256x256/apps/pipewizard.png
 
 %changelog
-* Mon Nov 02 2026 PipeWizard maintainers - 1.0.2-1
-- Add Linux RPM package
+* Mon Nov 02 2026 PipeWizard maintainers - 1.0.3-1
+- Avoid requiring an unavailable optional LTTng diagnostics library

@@ -193,7 +193,7 @@
                         <StackPanel Spacing="14">
                             <StackPanel Spacing="2">
                                 <TextBlock Text="About" Classes="h2" />
-                                <TextBlock Text="PipeWizard 1.0.2" Classes="caption" />
+                                <TextBlock Text="PipeWizard 1.0.3" Classes="caption" />
                             </StackPanel>
 
                             <StackPanel Spacing="10">
