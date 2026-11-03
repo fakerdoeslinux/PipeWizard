@@ -149,7 +149,7 @@ internal static class Program
         // Wayland desktop, X11 otherwise). Set PIPEWIZARD_FORCE_X11=1 to pin the
         // X11 backend, which is useful for debugging and screen capture.
         builder = Environment.GetEnvironmentVariable("PIPEWIZARD_FORCE_X11") == "1"
-            ? builder.UseX11()
+            ? builder.UseX11().UseSkia().UseHarfBuzz()
             : builder.UsePlatformDetect();
 
         return builder
