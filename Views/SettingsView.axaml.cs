@@ -105,4 +105,37 @@ public partial class SettingsView : UserControl
             viewModel.SetConfigFile(path);
         }
     }
+
+    private async void PickNewerPort(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not SettingsViewModel viewModel)
+        {
+            return;
+        }
+
+        var storage = TopLevel.GetTopLevel(this)?.StorageProvider;
+        if (storage is null)
+        {
+            return;
+        }
+
+        var files = await storage.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Locate the Newer-built WiiCompiled executable",
+            AllowMultiple = false,
+            FileTypeFilter = new[]
+            {
+                new FilePickerFileType("WiiCompiled")
+                {
+                    Patterns = new[] { "WiiCompiled", "WiiCompiled.exe", "WiiCompiled*" },
+                },
+                FilePickerFileTypes.All,
+            },
+        });
+
+        if (files.Count > 0 && files[0].TryGetLocalPath() is { Length: > 0 } path)
+        {
+            viewModel.SetNewerPortExecutable(path);
+        }
+    }
 }

@@ -24,6 +24,7 @@ public sealed class InstalledMod
     public string InstallDirectory { get; set; } = string.Empty;
     public string OverlayRoot { get; set; } = string.Empty;
     public string Kind { get; set; } = "disc";
+    public bool RequiresNewer { get; set; }
     public DateTimeOffset InstalledAt { get; set; }
     public long SizeBytes { get; set; }
 

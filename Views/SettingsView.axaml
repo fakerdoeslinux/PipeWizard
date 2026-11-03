@@ -88,6 +88,21 @@
                                 <TextBlock Text="{Binding ConfigStatus}" Classes="caption" />
                             </StackPanel>
 
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="NEWER PORT EXECUTABLE" Classes="label" />
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                    <Border Classes="inset" Padding="10,8">
+                                        <TextBlock Text="{Binding NewerPortPath}" Classes="path" />
+                                    </Border>
+                                    <Button Grid.Column="1" Classes="icon" Click="PickNewerPort"
+                                            ToolTip.Tip="Locate the Newer-built WiiCompiled">
+                                        <PathIcon Data="{StaticResource IconFolder}" Width="15" Height="15" />
+                                    </Button>
+                                </Grid>
+                                <TextBlock Classes="caption" TextWrapping="Wrap"
+                                           Text="Needed by mods built on Newer Super Mario Bros. Wii (e.g. Mario's Final Adventure Wii)." />
+                            </StackPanel>
+
                             <Button Classes="ghost" HorizontalAlignment="Left" Padding="0"
                                     Command="{Binding AutoDetectCommand}">
                                 <TextBlock Text="Scan the usual locations again" Classes="accent"

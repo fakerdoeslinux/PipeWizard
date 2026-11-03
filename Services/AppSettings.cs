@@ -21,6 +21,10 @@ public sealed class AppSettings
     [JsonPropertyName("useMangoHud")]
     public bool UseMangoHud { get; set; }
 
+    /// <summary>Port binary built with Newer Super Mario Bros. Wii code linked in.</summary>
+    [JsonPropertyName("newerPortExecutable")]
+    public string? NewerPortExecutable { get; set; }
+
     [JsonPropertyName("windowWidth")]
     public int WindowWidth { get; set; } = 1240;
 

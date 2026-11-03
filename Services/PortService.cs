@@ -47,6 +47,42 @@ public static class PortService
         return onPath is null ? null : NormalizePath(onPath);
     }
 
+    /// <summary>Locates a Newer-built WiiCompiled (Newer SMBW code linked in).</summary>
+    public static string? FindNewerExecutable(AppSettings settings)
+    {
+        if (!string.IsNullOrWhiteSpace(settings.NewerPortExecutable))
+        {
+            var configured = NormalizePath(settings.NewerPortExecutable);
+            if (File.Exists(configured))
+            {
+                return configured;
+            }
+        }
+
+        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        var directories = new List<string>
+        {
+            Path.Combine(home, "Documents", "nsmbw-rev2", "nsmbw-newer-build"),
+            Path.Combine(home, "Documents", "NSMB-Wii-Native-Port", "nsmbw-newer-build"),
+            Path.Combine(home, "Documents", "nsmbw-newer-build"),
+            Path.Combine(home, "NSMB-Wii-Native-Port", "nsmbw-newer-build"),
+        };
+
+        foreach (var directory in directories)
+        {
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                var candidate = Path.Combine(directory, ExecutableName);
+                if (File.Exists(candidate))
+                {
+                    return NormalizePath(candidate);
+                }
+            }
+        }
+
+        return null;
+    }
+
     private static IEnumerable<string> CandidateExecutables()
     {
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);

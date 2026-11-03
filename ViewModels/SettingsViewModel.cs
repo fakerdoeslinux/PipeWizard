@@ -66,6 +66,10 @@ public sealed class SettingsViewModel : ObservableObject
     public ObservableCollection<string> GraphicsApis { get; }
 
     public string PortPath => State.PortExecutable ?? "Not found";
+
+    /// <summary>Path to the Newer-built port (Newer SMBW code linked in).</summary>
+    public string NewerPortPath => State.NewerPortExecutable ?? "Not found";
+
     public string GamePath => State.GameFolder ?? "Not set";
     public string ConfigPath => State.ConfigFile;
 
@@ -193,6 +197,14 @@ public sealed class SettingsViewModel : ObservableObject
         var error = State.SetPortExecutable(path);
         Reload();
         StatusMessage = error.Length == 0 ? "Port location saved." : error;
+        StatusIsError = error.Length > 0;
+    }
+
+    public void SetNewerPortExecutable(string path)
+    {
+        var error = State.SetNewerPortExecutable(path);
+        Reload();
+        StatusMessage = error.Length == 0 ? "Newer port location saved." : error;
         StatusIsError = error.Length > 0;
     }
 

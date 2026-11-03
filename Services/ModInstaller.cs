@@ -88,6 +88,7 @@ public sealed class ModInstaller
                 // PipeWizard data directory was moved to another machine or drive.
                 mod.InstallDirectory = directory;
                 mod.OverlayRoot = directory;
+                mod.RequiresNewer = DetectRequiresNewer(directory);
                 result.Add(mod);
             }
             catch (Exception exception)
@@ -207,6 +208,7 @@ public sealed class ModInstaller
 
             var kind = DetectKind(target);
             var size = DirectorySize(target);
+            var requiresNewer = DetectRequiresNewer(target);
             var installed = new InstalledMod
             {
                 ModId = summary.Id,
@@ -222,6 +224,7 @@ public sealed class ModInstaller
                 InstallDirectory = target,
                 OverlayRoot = target,
                 Kind = kind,
+                RequiresNewer = requiresNewer,
                 InstalledAt = DateTimeOffset.Now,
                 SizeBytes = size,
             };
@@ -549,6 +552,27 @@ public sealed class ModInstaller
         return Directory.Exists(riivo) && FindRiivolutionXmls(riivo, topLevelOnly: true).Count > 0
             ? "riivolution"
             : "disc";
+    }
+
+    /// <summary>
+    /// A mod requires the Newer-built port when it carries Newer's code-injection files
+    /// (e.g. <c>NewerRes/DLCode*_1.bin</c>) that the vanilla port does not understand.
+    /// Mario's Final Adventure Wii is the canonical example.
+    /// </summary>
+    private static bool DetectRequiresNewer(string target)
+    {
+        // Newer's code-injection files may live in a nested folder (e.g. MFAWii/NewerRes),
+        // so search recursively for a NewerRes directory carrying DLCode/DLRelocs.
+        foreach (var newerRes in Directory.EnumerateDirectories(target, "NewerRes", SearchOption.AllDirectories))
+        {
+            if (Directory.EnumerateFiles(newerRes, "DLCode*_1.bin").Any() ||
+                Directory.EnumerateFiles(newerRes, "DLRelocs*_1.bin").Any())
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static bool IsInsideDirectory(string file, string directory)

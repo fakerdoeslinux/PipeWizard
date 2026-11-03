@@ -27,6 +27,9 @@ public sealed class AppState
     public ObservableCollection<InstalledMod> InstalledMods { get; } = new();
 
     public string? PortExecutable { get; private set; }
+
+    /// <summary>Port binary built with Newer Super Mario Bros. Wii code linked in.</summary>
+    public string? NewerPortExecutable { get; private set; }
     public string? GameFolder { get; private set; }
     public GameValidation Game { get; private set; } = GameValidation.Invalid("The game folder is not set.");
     public string ConfigFile { get; private set; } = string.Empty;
@@ -34,6 +37,10 @@ public sealed class AppState
     public string? LastError { get; private set; }
 
     public bool IsPortReady => !string.IsNullOrWhiteSpace(PortExecutable) && File.Exists(PortExecutable);
+
+    /// <summary>Whether a Newer-built port is available for mods that need it.</summary>
+    public bool IsNewerPortReady =>
+        !string.IsNullOrWhiteSpace(NewerPortExecutable) && File.Exists(NewerPortExecutable);
     public bool IsGameReady => Game.IsValid && GameFolder is not null;
     public bool CanPlay => IsPortReady && IsGameReady && !Launcher.IsRunning;
     public bool IsGameRunning => Launcher.IsRunning;
@@ -58,6 +65,7 @@ public sealed class AppState
         LastError = null;
 
         PortExecutable = PortService.FindExecutable(Settings);
+        NewerPortExecutable = PortService.FindNewerExecutable(Settings);
         ConfigFile = PortService.ResolveConfigPath(PortExecutable, Settings);
         Config = TomlConfig.Load(ConfigFile);
         _overlayRoots = ReadOverlayRoots();
@@ -81,6 +89,19 @@ public sealed class AppState
         }
 
         Settings.PortExecutable = PortService.NormalizePath(path);
+        Settings.Save();
+        Refresh();
+        return string.Empty;
+    }
+
+    public string SetNewerPortExecutable(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+        {
+            return "That file does not exist.";
+        }
+
+        Settings.NewerPortExecutable = PortService.NormalizePath(path);
         Settings.Save();
         Refresh();
         return string.Empty;
@@ -179,6 +200,21 @@ public sealed class AppState
             return (false, Game.Error ?? "Set your extracted game folder first.");
         }
 
+        // Mods that carry Newer SMBW's code-injection files (like Mario's Final Adventure
+        // Wii) need the Newer-built port, which has Newer's loader linked in. Launching
+        // them with the vanilla port crashes with "Missing translated function".
+        var executable = PortExecutable!;
+        if (EnabledModRequiresNewer)
+        {
+            if (!IsNewerPortReady)
+            {
+                return (false,
+                    "An enabled mod needs the Newer-built port, but WiiCompiled-Newer was not found. " +
+                    "Set its location in Settings or build it from the Newer port source.");
+            }
+            executable = NewerPortExecutable!;
+        }
+
         var dvdRoot = Config.GetString("paths", "dvd_root");
         if (!string.Equals(
                 dvdRoot is null ? null : PortService.ResolveRelativeToConfig(dvdRoot, ConfigFile),
@@ -193,10 +229,14 @@ public sealed class AppState
             }
         }
 
-        var result = Launcher.Launch(PortExecutable!, Settings.UseMangoHud);
+        var result = Launcher.Launch(executable, Settings.UseMangoHud);
         LaunchStateChanged?.Invoke(this, EventArgs.Empty);
         return (result.Started, result.Message);
     }
+
+    /// <summary>True when any enabled mod requires the Newer-built port.</summary>
+    public bool EnabledModRequiresNewer =>
+        InstalledMods.Any(mod => mod.Enabled && mod.RequiresNewer);
 
     public void SetMangoHud(bool enabled)
     {
